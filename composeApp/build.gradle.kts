@@ -14,12 +14,12 @@ plugins {
 
 kotlin {
   androidTarget {
-    compilations.all {
-      kotlinOptions {
-        jvmTarget = "${JavaVersion.VERSION_1_8}"
-        freeCompilerArgs += "-Xjdk-release=${JavaVersion.VERSION_1_8}"
-      }
-    }
+//    compilations.all {
+//      kotlinOptions {
+//        jvmTarget = "${JavaVersion.VERSION_1_8}"
+//        freeCompilerArgs += "-Xjdk-release=${JavaVersion.VERSION_1_8}"
+//      }
+//    }
     //https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-test.html
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     instrumentedTestVariant {
@@ -48,6 +48,14 @@ kotlin {
     all {
       languageSettings {
         optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+        optIn("com.russhwolf.settings.ExperimentalSettingsApi")
+        optIn("androidx.compose.material3.ExperimentalMaterial3Api")
+        optIn("androidx.compose.foundation.ExperimentalFoundationApi")
+        optIn("kotlinx.coroutines.DelicateCoroutinesApi")
+        optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+//        optIn("org.orbitmvi.orbit.annotation.OrbitExperimental")
+        optIn("androidx.compose.foundation.layout.ExperimentalLayoutApi")
+        optIn("androidx.compose.ui.text.ExperimentalTextApi")
       }
     }
     commonMain.dependencies {
@@ -83,6 +91,8 @@ kotlin {
       implementation(compose.uiTooling)
       implementation(libs.androidx.activityCompose)
       implementation(libs.kotlinx.coroutines.android)
+      //noinspection UseTomlInstead
+      implementation("net.java.dev.jna:jna:5.14.0@aar")
     }
 
     jvmMain.dependencies {
@@ -101,12 +111,12 @@ android {
   compileSdk = 34
 
   defaultConfig {
-    minSdk = 24
+    minSdk = 28
     targetSdk = 34
 
     applicationId = "dev.darkokoa.fubukidaze.androidApp"
     versionCode = 1
-    versionName = "1.0.0"
+    versionName = "24.04.18"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -126,8 +136,8 @@ android {
     }
   }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
   }
   buildFeatures {
     compose = true
@@ -144,7 +154,7 @@ compose.desktop {
     nativeDistributions {
       targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
       packageName = "dev.darkokoa.fubukidaze.desktopApp"
-      packageVersion = "1.0.0"
+      packageVersion = "24.04.18"
     }
   }
 }

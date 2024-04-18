@@ -1,4 +1,4 @@
-package dev.darkokoa.fubukidaze.theme
+package dev.darkokoa.fubukidaze.ui.theme
 
 import androidx.compose.runtime.Composable
 

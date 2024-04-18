@@ -1,4 +1,4 @@
-package dev.darkokoa.fubukidaze.theme
+package dev.darkokoa.fubukidaze.ui.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -9,9 +9,9 @@ import platform.UIKit.setStatusBarStyle
 
 @Composable
 internal actual fun SystemAppearance(isDark: Boolean) {
-    LaunchedEffect(isDark) {
-        UIApplication.sharedApplication.setStatusBarStyle(
-            if (isDark) UIStatusBarStyleDarkContent else UIStatusBarStyleLightContent
-        )
-    }
+  LaunchedEffect(isDark) {
+    UIApplication.sharedApplication.setStatusBarStyle(
+      if (isDark) UIStatusBarStyleDarkContent else UIStatusBarStyleLightContent
+    )
+  }
 }
