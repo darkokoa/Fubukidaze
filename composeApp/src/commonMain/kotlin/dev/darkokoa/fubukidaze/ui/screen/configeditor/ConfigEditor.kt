@@ -1,24 +1,24 @@
 package dev.darkokoa.fubukidaze.ui.screen.configeditor
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import compose.icons.FeatherIcons
-import compose.icons.feathericons.Settings
+import compose.icons.feathericons.Edit
 import dev.darkokoa.fubukidaze.launchFubuki
 import dev.darkokoa.fubukidaze.ui.BlankSpacer
 import dev.darkokoa.fubukidaze.ui.screen.Screen
@@ -35,18 +35,41 @@ class ConfigEditor : Screen {
     val uiModel = getScreenModel<ConfigEditorUiModel>()
     val uiState by uiModel.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val imeController = LocalSoftwareKeyboardController.current
+
     uiModel.collectSideEffect {
       when (it) {
         is ConfigEditorSideEffect.Launch -> launchFubuki(it.config)
+        is ConfigEditorSideEffect.SnackbarMessage -> snackbarHostState.showSnackbar(it.message)
       }
+    }
+
+    LifecycleEffect(
+      onDisposed = { imeController?.hide() }
+    )
+
+    if (uiState.showConfigInputDialog) {
+      ConfigInputDialog(
+        onDismiss = uiModel::onDismissConfigInputDialog,
+        onInputConfirm = uiModel::onAutofillViaJson
+      )
     }
 
     Scaffold(
       topBar = {
         ConfigEditorTopBar(
-          openSettings = { navigator.push(Settings()) }
+          openSettings = { navigator.push(Settings()) },
+          onLaunch = uiModel::onLaunch,
+          onShowConfigInputDialog = {
+            imeController?.hide()
+            uiModel.onShowConfigInputDialog()
+          },
+          canLaunch = uiState.canLaunch
         )
-      }
+      },
+      snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+      modifier = Modifier.imePadding()
     ) { paddingValues ->
       Column(
         modifier = Modifier.fillMaxSize()
@@ -109,15 +132,6 @@ class ConfigEditor : Screen {
           label = { Text("tun addr netmask") }
         )
 
-        BlankSpacer(height = 32.dp)
-
-        Button(
-          onClick = uiModel::onLaunch,
-          modifier = Modifier.fillMaxWidth()
-        ) {
-          Text("Launch")
-        }
-
         BlankSpacer(height = 16.dp)
       }
     }
@@ -126,15 +140,65 @@ class ConfigEditor : Screen {
   @Composable
   private fun ConfigEditorTopBar(
     openSettings: () -> Unit,
+    onLaunch: () -> Unit,
+    onShowConfigInputDialog: () -> Unit,
+    canLaunch: Boolean,
     modifier: Modifier = Modifier,
   ) {
     TopAppBar(
       title = { Text("Fubukidaze") },
       modifier = modifier,
       actions = {
-        IconButton(onClick = openSettings) {
-          Icon(imageVector = FeatherIcons.Settings, contentDescription = null)
+//        IconButton(onClick = openSettings) {
+//          Icon(imageVector = FeatherIcons.Settings, contentDescription = null)
+//        }
+
+        IconButton(onClick = onShowConfigInputDialog) {
+          Icon(imageVector = FeatherIcons.Edit, contentDescription = null)
         }
+
+        Button(onClick = onLaunch, enabled = canLaunch) { Text("launch") }
+
+        Spacer(Modifier.width(8.dp))
+      }
+    )
+  }
+
+  @Composable
+  private fun ConfigInputDialog(
+    onDismiss: () -> Unit,
+    onInputConfirm: (String) -> Unit
+  ) {
+    val requester = remember { FocusRequester() }
+    var input by remember { mutableStateOf(TextFieldValue()) }
+
+    LaunchedEffect(Unit) {
+      requester.requestFocus()
+    }
+
+    AlertDialog(
+      onDismissRequest = onDismiss,
+      confirmButton = {
+        TextButton(onClick = {
+          onInputConfirm(input.text)
+          onDismiss()
+        }) {
+          Text("Confirm")
+        }
+      },
+      title = {
+        Text("Autofill via JSON")
+      },
+      text = {
+        OutlinedTextField(
+          value = input,
+          onValueChange = { input = it },
+          modifier = Modifier.focusRequester(requester),
+          label = {
+            Text("fubuki config")
+          },
+          minLines = 8
+        )
       }
     )
   }

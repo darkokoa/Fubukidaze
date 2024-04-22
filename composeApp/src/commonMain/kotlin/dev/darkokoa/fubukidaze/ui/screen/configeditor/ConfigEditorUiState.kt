@@ -9,4 +9,6 @@ data class ConfigEditorUiState(
   val key: TextFieldValue = TextFieldValue(),
   val tunAddrIp: TextFieldValue = TextFieldValue(),
   val tunAddrNetmask: TextFieldValue = TextFieldValue(),
+  val showConfigInputDialog: Boolean = false,
+  val canLaunch: Boolean = false
 )

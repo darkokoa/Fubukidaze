@@ -116,7 +116,7 @@ android {
 
     applicationId = "dev.darkokoa.fubukidaze.androidApp"
     versionCode = 1
-    versionName = "24.04.18"
+    versionName = "24.04.22"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -154,7 +154,7 @@ compose.desktop {
     nativeDistributions {
       targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
       packageName = "dev.darkokoa.fubukidaze.desktopApp"
-      packageVersion = "24.04.18"
+      packageVersion = "24.04.22"
     }
   }
 }
