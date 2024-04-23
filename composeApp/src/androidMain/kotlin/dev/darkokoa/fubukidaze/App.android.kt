@@ -9,9 +9,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import dev.darkokoa.fubukidaze.android.service.FubukiVpnService
 import dev.darkokoa.fubukidaze.core.koin.KoinInitializer
 import dev.darkokoa.fubukidaze.data.pojo.FubukiNodeConfig
+import dev.darkokoa.fubukidaze.ui.screen.uncaughtexceptionlog.UncaughtExceptionLog
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class AndroidApp : Application() {
   companion object {
@@ -19,6 +23,7 @@ class AndroidApp : Application() {
   }
 
   override fun onCreate() {
+    registerUncaughtExceptionLog()
     super.onCreate()
     KoinInitializer.initialize()
     INSTANCE = this
@@ -64,4 +69,13 @@ internal actual fun launchFubuki(config: FubukiNodeConfig) {
 
 
   FubukiVpnService.start(context, config)
+}
+
+internal fun registerUncaughtExceptionLog() {
+  Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
+    GlobalNavigator.tryTransaction {
+      push(UncaughtExceptionLog(throwable.stackTraceToString()))
+    }
+    throwable.printStackTrace()
+  }
 }
