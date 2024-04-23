@@ -65,17 +65,19 @@ class FubukiVpnService : VpnService(), KoinComponent {
     }
 
     val config = Json.decodeFromString<FubukiNodeConfig>(configJsonString)
-    val group = config.groups.first()
-
-    val addrIp = group.tun_addr.ip
-    val addrNetmask = group.tun_addr.netmask
 
     val builder = Builder().apply {
-      setMtu(1446)
-      addAddress(addrIp, netmaskToPrefixLength(addrNetmask))
+      setMtu(config.mtu)
+      config.groups.forEach { group ->
+        group.tun_addr ?: return@forEach
+
+        val addrIp = group.tun_addr.ip
+        val addrNetmask = group.tun_addr.netmask
+        addAddress(addrIp, netmaskToPrefixLength(addrNetmask))
+      }
 //      addRoute("0.0.0.0", 0)
       addDnsServer(FUBUKI_DEFAULT_DNS_SERVER)
-      setSession(config.groups.first().node_name)
+//      setSession(config.api_addr ?: "")
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         setMetered(false)
       }

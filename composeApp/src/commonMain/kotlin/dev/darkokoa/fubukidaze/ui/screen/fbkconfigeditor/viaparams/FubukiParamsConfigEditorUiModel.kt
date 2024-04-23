@@ -1,4 +1,4 @@
-package dev.darkokoa.fubukidaze.ui.screen.configeditor
+package dev.darkokoa.fubukidaze.ui.screen.fbkconfigeditor.viaparams
 
 import androidx.compose.ui.text.input.TextFieldValue
 import dev.darkokoa.fubukidaze.core.UiModel
@@ -6,12 +6,11 @@ import dev.darkokoa.fubukidaze.core.base.util.AppCoroutineDispatchers
 import dev.darkokoa.fubukidaze.data.pojo.FubukiNodeConfig
 import dev.darkokoa.fubukidaze.data.pojo.Group
 import dev.darkokoa.fubukidaze.data.pojo.TunAddr
-import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.Json
 
-class ConfigEditorUiModel(
+class FubukiParamsConfigEditorUiModel(
   private val coroutineDispatchers: AppCoroutineDispatchers
-) : UiModel<ConfigEditorUiState, ConfigEditorSideEffect>(ConfigEditorUiState()) {
+) : UiModel<FubukiParamsConfigEditorUiState, FubukiParamsConfigEditorSideEffect>(FubukiParamsConfigEditorUiState()) {
 
   fun onNodeNameInputChange(nodeName: TextFieldValue) = intent {
     reduce { it.copy(nodeName = nodeName) }
@@ -53,7 +52,7 @@ class ConfigEditorUiModel(
     val tunAddrNetmask = uiState.tunAddrNetmask.text.trim()
 
     val fubukiNodeConfig = FubukiNodeConfig(
-      listOf(
+      groups = listOf(
         Group(
           node_name = nodeName,
           server_addr = serverAddr,
@@ -64,34 +63,7 @@ class ConfigEditorUiModel(
     )
 
 //    postSideEffect(ConfigEditorSideEffect.SnackbarMessage("Launching..."))
-    postSideEffect(ConfigEditorSideEffect.Launch(fubukiNodeConfig))
-  }
-
-  fun onAutofillViaJson(configJson: String) = intent {
-    runCatching {
-      Json.decodeFromString<FubukiNodeConfig>(configJson)
-    }.onSuccess {
-      val group = it.groups.first()
-
-      onNodeNameInputChange(TextFieldValue(group.node_name))
-      onServerIpInputChange(TextFieldValue(group.server_addr.split(':').first()))
-      onServerPortInputChange(TextFieldValue(group.server_addr.split(':').last()))
-      onKeyInputChange(TextFieldValue(group.key))
-      onTunAddrIpInputChange(TextFieldValue(group.tun_addr.ip))
-      onTunAddrNetmaskInputChange(TextFieldValue(group.tun_addr.netmask))
-
-    }.onFailure {
-      it.printStackTrace()
-      postSideEffect(ConfigEditorSideEffect.SnackbarMessage("Config is incorrect ❌"))
-    }
-  }
-
-  fun onShowConfigInputDialog() = intent {
-    reduce { it.copy(showConfigInputDialog = true) }
-  }
-
-  fun onDismissConfigInputDialog() = intent {
-    reduce { it.copy(showConfigInputDialog = false) }
+    postSideEffect(FubukiParamsConfigEditorSideEffect.Launch(fubukiNodeConfig))
   }
 
   private fun reduceCanLaunch() = intent {

@@ -1,4 +1,4 @@
-package dev.darkokoa.fubukidaze.ui.screen.configeditor
+package dev.darkokoa.fubukidaze.ui.screen.fbkconfigeditor.viaparams
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -24,7 +24,7 @@ import dev.darkokoa.fubukidaze.ui.BlankSpacer
 import dev.darkokoa.fubukidaze.ui.screen.Screen
 import dev.darkokoa.fubukidaze.ui.screen.settings.Settings
 
-class ConfigEditor : Screen {
+class FubukiParamsConfigEditor : Screen {
 
   @Composable
   override fun Content(
@@ -32,7 +32,7 @@ class ConfigEditor : Screen {
     bottomSheetNavigator: BottomSheetNavigator
   ) {
 
-    val uiModel = getScreenModel<ConfigEditorUiModel>()
+    val uiModel = getScreenModel<FubukiParamsConfigEditorUiModel>()
     val uiState by uiModel.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -40,8 +40,8 @@ class ConfigEditor : Screen {
 
     uiModel.collectSideEffect {
       when (it) {
-        is ConfigEditorSideEffect.Launch -> launchFubuki(it.config)
-        is ConfigEditorSideEffect.SnackbarMessage -> snackbarHostState.showSnackbar(it.message)
+        is FubukiParamsConfigEditorSideEffect.Launch -> launchFubuki(it.config)
+        is FubukiParamsConfigEditorSideEffect.SnackbarMessage -> snackbarHostState.showSnackbar(it.message)
       }
     }
 
@@ -49,22 +49,12 @@ class ConfigEditor : Screen {
       onDisposed = { imeController?.hide() }
     )
 
-    if (uiState.showConfigInputDialog) {
-      ConfigInputDialog(
-        onDismiss = uiModel::onDismissConfigInputDialog,
-        onInputConfirm = uiModel::onAutofillViaJson
-      )
-    }
 
     Scaffold(
       topBar = {
         ConfigEditorTopBar(
           openSettings = { navigator.push(Settings()) },
           onLaunch = uiModel::onLaunch,
-          onShowConfigInputDialog = {
-            imeController?.hide()
-            uiModel.onShowConfigInputDialog()
-          },
           canLaunch = uiState.canLaunch
         )
       },
@@ -141,7 +131,6 @@ class ConfigEditor : Screen {
   private fun ConfigEditorTopBar(
     openSettings: () -> Unit,
     onLaunch: () -> Unit,
-    onShowConfigInputDialog: () -> Unit,
     canLaunch: Boolean,
     modifier: Modifier = Modifier,
   ) {
@@ -153,52 +142,9 @@ class ConfigEditor : Screen {
 //          Icon(imageVector = FeatherIcons.Settings, contentDescription = null)
 //        }
 
-        IconButton(onClick = onShowConfigInputDialog) {
-          Icon(imageVector = FeatherIcons.Edit, contentDescription = null)
-        }
-
         Button(onClick = onLaunch, enabled = canLaunch) { Text("launch") }
 
-        Spacer(Modifier.width(8.dp))
-      }
-    )
-  }
-
-  @Composable
-  private fun ConfigInputDialog(
-    onDismiss: () -> Unit,
-    onInputConfirm: (String) -> Unit
-  ) {
-    val requester = remember { FocusRequester() }
-    var input by remember { mutableStateOf(TextFieldValue()) }
-
-    LaunchedEffect(Unit) {
-      requester.requestFocus()
-    }
-
-    AlertDialog(
-      onDismissRequest = onDismiss,
-      confirmButton = {
-        TextButton(onClick = {
-          onInputConfirm(input.text)
-          onDismiss()
-        }) {
-          Text("Confirm")
-        }
-      },
-      title = {
-        Text("Autofill via JSON")
-      },
-      text = {
-        OutlinedTextField(
-          value = input,
-          onValueChange = { input = it },
-          modifier = Modifier.focusRequester(requester),
-          label = {
-            Text("fubuki config")
-          },
-          minLines = 8
-        )
+        BlankSpacer(8.dp)
       }
     )
   }

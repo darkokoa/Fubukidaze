@@ -1,8 +1,8 @@
-package dev.darkokoa.fubukidaze.ui.screen.configeditor
+package dev.darkokoa.fubukidaze.ui.screen.fbkconfigeditor.viaparams
 
 import androidx.compose.ui.text.input.TextFieldValue
 
-data class ConfigEditorUiState(
+data class FubukiParamsConfigEditorUiState(
   val nodeName: TextFieldValue = TextFieldValue(),
   val serverIp: TextFieldValue = TextFieldValue(),
   val serverPort: TextFieldValue = TextFieldValue(),

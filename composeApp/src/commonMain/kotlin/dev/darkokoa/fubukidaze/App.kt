@@ -5,13 +5,14 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import dev.darkokoa.fubukidaze.data.pojo.FubukiNodeConfig
-import dev.darkokoa.fubukidaze.ui.screen.configeditor.ConfigEditor
+import dev.darkokoa.fubukidaze.ui.screen.fbkconfigeditor.viajson.FubukiJsonConfigEditor
+import dev.darkokoa.fubukidaze.ui.screen.fbkconfigeditor.viaparams.FubukiParamsConfigEditor
 import dev.darkokoa.fubukidaze.ui.theme.AppTheme
 
 @Composable
 internal fun App() = AppTheme {
   BottomSheetNavigator {
-    Navigator(ConfigEditor()) {
+    Navigator(FubukiJsonConfigEditor()) {
       SlideTransition(it)
     }
   }
