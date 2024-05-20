@@ -3,6 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import com.android.build.api.dsl.ManagedVirtualDevice
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import java.time.LocalDate
 
 plugins {
   alias(libs.plugins.multiplatform)
@@ -106,6 +107,16 @@ kotlin {
   }
 }
 
+val fubukidazeVersion = LocalDate.now().let { localDate ->
+  buildString {
+    append(localDate.year - 2000)
+    append('.')
+    append(if (localDate.monthValue >= 10) localDate.monthValue else "0${localDate.monthValue}")
+    append('.')
+    append(if (localDate.dayOfMonth >= 10) localDate.dayOfMonth else "0${localDate.dayOfMonth}")
+  }
+}
+
 android {
   namespace = "dev.darkokoa.fubukidaze"
   compileSdk = 34
@@ -115,8 +126,8 @@ android {
     targetSdk = 34
 
     applicationId = "dev.darkokoa.fubukidaze.androidApp"
-    versionCode = 1
-    versionName = "24.04.22"
+    versionCode = fubukidazeVersion.replace(".", "").toInt()
+    versionName = fubukidazeVersion
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -154,7 +165,7 @@ compose.desktop {
     nativeDistributions {
       targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
       packageName = "dev.darkokoa.fubukidaze.desktopApp"
-      packageVersion = "24.04.22"
+      packageVersion = fubukidazeVersion
     }
   }
 }
