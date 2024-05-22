@@ -50,6 +50,7 @@ kotlin {
       languageSettings {
         optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
         optIn("com.russhwolf.settings.ExperimentalSettingsApi")
+        optIn("androidx.compose.material.ExperimentalMaterialApi")
         optIn("androidx.compose.material3.ExperimentalMaterial3Api")
         optIn("androidx.compose.foundation.ExperimentalFoundationApi")
         optIn("kotlinx.coroutines.DelicateCoroutinesApi")
