@@ -8,11 +8,12 @@ import android.net.*
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import androidx.core.app.NotificationCompat
+import dev.darkokoa.fubukidaze.android.notification.FubukidazeNotification
+import dev.darkokoa.fubukidaze.android.service.FubukiVpnService.Companion.Action.*
 import dev.darkokoa.fubukidaze.android.util.fubuki.FubukiJNA
-import dev.darkokoa.fubukidaze.core.base.util.AppCoroutineDispatchers
 import dev.darkokoa.fubukidaze.core.base.util.AppCoroutineScope
 import dev.darkokoa.fubukidaze.core.base.util.netmaskToPrefixLength
-import dev.darkokoa.fubukidaze.data.pojo.FubukiNodeConfig
+import dev.darkokoa.fubukidaze.data.model.pojo.FubukiNodeConfig
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
@@ -21,7 +22,8 @@ import org.koin.core.component.inject
 class FubukiVpnService : VpnService(), KoinComponent {
 
   private val appCoroutineScope: AppCoroutineScope by inject()
-  private val appCoroutineDispatchers: AppCoroutineDispatchers by inject()
+
+  private val dazeNotification:FubukidazeNotification by inject()
 
   private val fubuki: FubukiJNA = FubukiJNA.INSTANCE
 
@@ -32,26 +34,36 @@ class FubukiVpnService : VpnService(), KoinComponent {
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-    setup(intent)
+    @Suppress("DEPRECATION")
+    when (intent?.getSerializableExtra(ARG_SERVICE_ACTION) as Action?) {
+      Launch -> {
+        setupAndLaunchFubuki(intent)
 
-    val channelId = createNotificationChannel()
+        dazeNotification.notifyFubukiVpnConnect(this, FUBUKI_VPN_SERVICE_NOTIFICATION_ID)
+      }
 
-    val nb = NotificationCompat.Builder(this, channelId)
-      .setContentTitle("Fubuki VPN Service")
-      .setContentText("lalalala")
-      .setPriority(NotificationCompat.PRIORITY_MAX)
+      Terminate -> {
+        terminateFubuki()
+      }
 
-    startForeground(FUBUKI_VPN_SERVICE_NOTIFICATION_ID, nb.build())
+      Switch -> {
+        println("$TAG ARG_SERVICE_ACTION: Switch")
+        terminateFubuki(false)
+        setupAndLaunchFubuki(intent)
+      }
+
+      null -> {}
+    }
 
     return START_STICKY
   }
 
   override fun onRevoke() {
-    stopFubuki()
+    terminateFubuki()
   }
 
-  private fun setup(intent: Intent?) {
-    println("$TAG setup(intent: $intent)")
+  private fun setupAndLaunchFubuki(intent: Intent?) {
+    println("$TAG setupAndLaunchFubuki(intent: $intent)")
 
     intent ?: return
     val configJsonString = intent.getStringExtra(ARG_FUBUKI_NODE_CONFIG) ?: return
@@ -83,12 +95,8 @@ class FubukiVpnService : VpnService(), KoinComponent {
       }
     }
 
-    try {
-      pfd?.close()
-    } catch (ignored: Exception) {
-      ignored.printStackTrace()
-      // ignored
-    }
+    pfd?.close()
+    pfd = null
 
     try {
       val _pfd = builder.establish() ?: return
@@ -107,66 +115,70 @@ class FubukiVpnService : VpnService(), KoinComponent {
 
     } catch (e: Exception) {
       e.printStackTrace()
-      stopFubuki()
+      terminateFubuki()
     }
   }
 
-  private fun stopFubuki(isForced: Boolean = true) {
-
+  private fun terminateFubuki(executeStopSelf: Boolean = true) {
     isRunning = false
 
-    try {
-      fubukiHandle?.let(fubuki::fubuki_stop)
-    } catch (e: Exception) {
-      // ignored
-    }
+    fubukiHandle?.let(fubuki::fubuki_stop)
+    fubukiHandle = null
 
-    if (isForced) {
+    pfd?.close()
+    pfd = null
+
+    if (executeStopSelf) {
       stopSelf()
-
-      try {
-        pfd?.close()
-      } catch (ignored: Exception) {
-        ignored.printStackTrace()
-        // ignored
-      }
     }
-  }
-
-  private fun createNotificationChannel(): String {
-    val channelId = "FUBUKI_CHANNEL_DEFAULT_ID"
-    val channelName = "fubuki channel default"
-    val chan = NotificationChannel(
-      channelId,
-      channelName,
-      NotificationManager.IMPORTANCE_HIGH
-    )
-    getNotificationManager()?.createNotificationChannel(chan)
-    return channelId
-  }
-
-  private fun getNotificationManager(): NotificationManager? {
-    return this.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
   }
 
   companion object {
     private const val TAG = "FubukiVpnService"
     private const val ARG_FUBUKI_NODE_CONFIG = TAG + "_arg_fubuki_node_config"
+    private const val ARG_SERVICE_ACTION = TAG + "_arg_service_action"
 
     private const val FUBUKI_DEFAULT_DNS_SERVER = "1.1.1.1"
-    private const val FUBUKI_VPN_SERVICE_NOTIFICATION_ID = 0x0900
+    const val FUBUKI_VPN_SERVICE_NOTIFICATION_ID = 0x0900
 
-    fun start(
+    enum class Action {
+      Launch, Terminate, Switch
+    }
+
+    fun launch(
       context: Context,
       fubukiNodeConfig: FubukiNodeConfig
     ) {
       val configJsonString = Json.encodeToString(fubukiNodeConfig)
       context.startForegroundService(
-        Intent().apply {
+        Intent(context, FubukiVpnService::class.java).apply {
           setPackage(context.packageName)
+          putExtra(ARG_SERVICE_ACTION, Launch)
           putExtra(ARG_FUBUKI_NODE_CONFIG, configJsonString)
         }
       )
+    }
+
+    fun terminate(
+      context: Context,
+    ) {
+      context.startService(Intent(context, FubukiVpnService::class.java).apply {
+        setPackage(context.packageName)
+        putExtra(ARG_SERVICE_ACTION, Terminate)
+      })
+    }
+
+    fun switchConnection(
+      context: Context,
+      fubukiNodeConfig: FubukiNodeConfig
+    ) {
+      val configJsonString = Json.encodeToString(fubukiNodeConfig)
+
+      context.startService(Intent(context, FubukiVpnService::class.java).apply {
+        setPackage(context.packageName)
+        putExtra(ARG_SERVICE_ACTION, Switch)
+        putExtra(ARG_FUBUKI_NODE_CONFIG, configJsonString)
+      })
     }
   }
 }

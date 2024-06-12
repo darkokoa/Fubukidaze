@@ -1,6 +1,6 @@
 @file:Suppress("PropertyName")
 
-package dev.darkokoa.fubukidaze.data.pojo
+package dev.darkokoa.fubukidaze.data.model.pojo
 
 import kotlinx.serialization.Serializable
 
@@ -25,7 +25,7 @@ data class FubukiNodeConfig(
 data class Group(
   val node_name: String? = null,
   val server_addr: String,
-  val tun_addr: TunAddr? = null,
+  val tun_addr: TunAddr,
   val key: String? = null,
   val enable_key_rotation: Boolean? = null,
   val mode: Mode? = null,

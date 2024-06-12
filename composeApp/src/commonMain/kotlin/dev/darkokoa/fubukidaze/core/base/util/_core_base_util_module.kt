@@ -9,16 +9,6 @@ import org.koin.dsl.module
 
 val coreBaseUtilModule = module {
   single {
-    AppCoroutineDispatchers(
-      io = Dispatchers.IO,
-      databaseWrite = Dispatchers.IO.limitedParallelism(1),
-      databaseRead = Dispatchers.IO.limitedParallelism(4),
-      computation = Dispatchers.Default,
-      main = Dispatchers.Main,
-    )
-  }
-
-  single {
-    CoroutineScope(get<AppCoroutineDispatchers>().main + SupervisorJob())
+    CoroutineScope(Dispatchers.Main + SupervisorJob())
   } bind AppCoroutineScope::class
 }

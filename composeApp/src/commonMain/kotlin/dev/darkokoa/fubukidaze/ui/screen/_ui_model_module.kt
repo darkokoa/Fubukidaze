@@ -1,11 +1,13 @@
 package dev.darkokoa.fubukidaze.ui.screen
 
-import dev.darkokoa.fubukidaze.ui.screen.fbkconfigeditor.viajson.FubukiJsonConfigEditorUiModel
-import dev.darkokoa.fubukidaze.ui.screen.fbkconfigeditor.viaparams.FubukiParamsConfigEditorUiModel
+import dev.darkokoa.fubukidaze.ui.screen.nodeeditor.NodeEditorUiModel
+import dev.darkokoa.fubukidaze.ui.screen.home.HomeUiModel
+import dev.darkokoa.fubukidaze.ui.screen.fubukillog.FubukilLogUiModel
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val uiModelModule = module {
-  factoryOf(::FubukiParamsConfigEditorUiModel)
-  factoryOf(::FubukiJsonConfigEditorUiModel)
+  factoryOf(::NodeEditorUiModel)
+  factoryOf(::HomeUiModel)
+  factoryOf(::FubukilLogUiModel)
 }

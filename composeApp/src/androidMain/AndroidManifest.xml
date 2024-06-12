@@ -33,7 +33,8 @@
         android:icon="@android:drawable/ic_menu_compass"
         android:networkSecurityConfig="@xml/network_security_config"
         android:label="fubukidaze"
-        android:theme="@android:style/Theme.Material.NoActionBar">
+        android:enableOnBackInvokedCallback="true"
+        android:theme="@android:style/Theme.Material.NoActionBar" tools:targetApi="tiramisu">
         <activity
             android:name=".AppActivity"
             android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode"

@@ -5,29 +5,31 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import dev.darkokoa.fubukidaze.core.base.util.AppCoroutineDispatchers
-import dev.darkokoa.fubukidaze.core.flow.EventFlow
-import dev.darkokoa.fubukidaze.core.flow.send
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 abstract class UiModel<UI_STATE, SIDE_EFFECT>(initialState: UI_STATE) : StateScreenModel<UI_STATE>(initialState),
   KoinComponent {
 
-  private val coroutineDispatchers: AppCoroutineDispatchers by inject()
+  private val sideEffectChannel = Channel<SIDE_EFFECT>(Channel.BUFFERED)
 
-  private val sideEffectFlow = EventFlow<SIDE_EFFECT>()
+  val sideEffectFlow = sideEffectChannel.receiveAsFlow()
 
-  fun intent(intentFn: suspend CoroutineScope.() -> Unit) = screenModelScope.launch(coroutineDispatchers.computation) {
-    intentFn()
-  }
+  val uiModelScope get() = screenModelScope
 
-  fun reduce(reduceFn: (UI_STATE) -> UI_STATE) {
-    mutableState.update { reduceFn(it) }
+  fun intent(intentBlock: suspend CoroutineScope.() -> Unit) =
+    uiModelScope.launch(Dispatchers.Default) {
+      intentBlock()
+    }
+
+  suspend fun reduce(reduceBlock: suspend (UI_STATE) -> UI_STATE) {
+    mutableState.update { reduceBlock(it) }
   }
 
   val uiState get() = mutableState.value
@@ -38,13 +40,13 @@ abstract class UiModel<UI_STATE, SIDE_EFFECT>(initialState: UI_STATE) : StateScr
   fun collectAsState() = state.collectAsState()
 
   suspend fun postSideEffect(sideEffectAction: SIDE_EFFECT) {
-    sideEffectFlow.emit(sideEffectAction)
+    sideEffectChannel.send(sideEffectAction)
   }
 
   @Composable
   fun collectSideEffect(sideEffect: (suspend (sideEffect: SIDE_EFFECT) -> Unit)) {
     LaunchedEffect(sideEffectFlow) {
-      sideEffectFlow.collect {
+      sideEffectChannel.receiveAsFlow().collect {
         sideEffect(it)
       }
     }
