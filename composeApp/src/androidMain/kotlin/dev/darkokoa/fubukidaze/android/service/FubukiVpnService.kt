@@ -1,19 +1,17 @@
 package dev.darkokoa.fubukidaze.android.service
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.net.*
 import android.os.Build
 import android.os.ParcelFileDescriptor
-import androidx.core.app.NotificationCompat
 import dev.darkokoa.fubukidaze.android.notification.FubukidazeNotification
 import dev.darkokoa.fubukidaze.android.service.FubukiVpnService.Companion.Action.*
 import dev.darkokoa.fubukidaze.android.util.fubuki.FubukiJNA
 import dev.darkokoa.fubukidaze.core.base.util.AppCoroutineScope
 import dev.darkokoa.fubukidaze.core.base.util.netmaskToPrefixLength
 import dev.darkokoa.fubukidaze.data.model.pojo.FubukiNodeConfig
+import dev.darkokoa.fubukidaze.data.model.pojo.ipsCollection
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
@@ -23,7 +21,7 @@ class FubukiVpnService : VpnService(), KoinComponent {
 
   private val appCoroutineScope: AppCoroutineScope by inject()
 
-  private val dazeNotification:FubukidazeNotification by inject()
+  private val dazeNotification: FubukidazeNotification by inject()
 
   private val fubuki: FubukiJNA = FubukiJNA.INSTANCE
 
@@ -81,13 +79,19 @@ class FubukiVpnService : VpnService(), KoinComponent {
     val builder = Builder().apply {
       setMtu(config.mtu)
       config.groups.forEach { group ->
-        group.tun_addr ?: return@forEach
-
         val addrIp = group.tun_addr.ip
         val addrNetmask = group.tun_addr.netmask
         addAddress(addrIp, netmaskToPrefixLength(addrNetmask))
+
+        println("$TAG group.ips?.values: ${group.ips?.values}")
+        println("$TAG group.ipsCollection: ${group.ipsCollection}")
+
+        group.ipsCollection.forEach { (address, prefixLength) ->
+          addRoute(address, prefixLength)
+          println("$TAG addRoute($address, $prefixLength)")
+        }
       }
-//      addRoute("0.0.0.0", 0)
+      addDisallowedApplication(this@FubukiVpnService.packageName)
       addDnsServer(FUBUKI_DEFAULT_DNS_SERVER)
 //      setSession(config.api_addr ?: "")
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

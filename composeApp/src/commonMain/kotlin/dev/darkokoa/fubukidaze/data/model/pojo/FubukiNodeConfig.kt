@@ -29,14 +29,29 @@ data class Group(
   val key: String? = null,
   val enable_key_rotation: Boolean? = null,
   val mode: Mode? = null,
-  val specify_mode: String? = null, // JsonElement?
+  val specify_mode: Map<String, Mode>? = null,
   val lan_ip_addr: String? = null,
   val allowed_ips: List<String>? = null,
-  val ips: String? = null, // JsonElement?
+  val ips: Map<String, List<String>>? = null,
   val allow_packet_forward: Boolean? = null,
   val allow_packet_not_in_rules_send_to_kernel: Boolean? = null,
   val socket_bind_device: String? = null,
 )
+
+val Group.ipsCollection
+  get() = ips?.values?.flatMap { routeList ->
+    routeList.mapNotNull { route ->
+      val parts = route.split("/")
+      if (parts.size == 2) {
+        val address = parts[0]
+        val prefixLength = parts[1].toIntOrNull()
+        if (address.isNotEmpty() && prefixLength != null) {
+          return@mapNotNull address to prefixLength
+        }
+      }
+      return@mapNotNull null
+    }
+  } ?: emptyList()
 
 @Serializable
 data class Mode(

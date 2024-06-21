@@ -19,6 +19,10 @@ class HomeUiModel(
         val fubukidazeNodeList = resultsChange.list.map { it.toPojo() }
         intent {
           reduce { it.copy(fubukidazeNodeList = fubukidazeNodeList) }
+
+          if (fubukidazeNodeList.find { uiState().selectedNodeId == it.id } == null) {
+            reduce { state -> state.copy(selectedNodeId = null) }
+          }
         }
       }.launchIn(this)
     }
@@ -31,11 +35,11 @@ class HomeUiModel(
       postSideEffect(HomeSideEffect.SwitchFubukiConnection(node.config))
     }
 
-    reduce { it.copy(selectedNode = node) }
+    reduce { it.copy(selectedNodeId = node.id) }
   }
 
   fun onLaunchClick() = intent {
-    val selectedNode = uiState().selectedNode
+    val selectedNode = uiState().selectedNodeId?.let { nodeDao.findById(it).find() }
     if (selectedNode == null) {
       postSideEffect(HomeSideEffect.SnackbarMessage("No node selected"))
       return@intent
@@ -46,7 +50,7 @@ class HomeUiModel(
     if (hasLaunch) {
       postSideEffect(HomeSideEffect.TerminateFubuki)
     } else {
-      postSideEffect(HomeSideEffect.LaunchFubuki(selectedNode.config))
+      postSideEffect(HomeSideEffect.LaunchFubuki(selectedNode.toPojo().config))
     }
 
     reduce { it.copy(hasLaunchFubuki = !hasLaunch) }

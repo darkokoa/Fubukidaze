@@ -107,7 +107,7 @@ private fun HomeContent(
         items(items = uiState.fubukidazeNodeList, key = { it.id }) { node ->
           FubukidazeNodeItem(
             node = node,
-            isSelect = node.id == uiState.selectedNode?.id,
+            isSelect = node.id == uiState.selectedNodeId,
             onItemClick = { onSelect(node) },
             onEditClick = {
               navigator.push(
