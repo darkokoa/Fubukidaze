@@ -1,26 +1,14 @@
-# Compose Multiplatform Application
+# Fubukidaze (work-in-progress 👷🔧️👷‍♀️⛏)
 
-## Before running!
- - check your system with [KDoctor](https://github.com/Kotlin/kdoctor)
- - install JDK 17 or higher on your machine
- - add `local.properties` file to the project root and set a path to Android SDK there
+[Fubuki](https://github.com/xutianyi1999/fubuki) Compose Multiplatform App
 
-### Android
-To run the application on android device/emulator:  
- - open project in Android Studio and run imported android run configuration
+| Platform      | Supported       |
+|---------------|-----------------|
+| Android       | ✅               |
+| iOS           | ❌ (In Progress) |
+| Desktop (JVM) | ❌ (No Plan)     |
 
-To build the application bundle:
- - run `./gradlew :composeApp:assembleDebug`
- - find `.apk` file in `composeApp/build/outputs/apk/debug/composeApp-debug.apk`
-Run android simulator UI tests: `./gradlew :composeApp:pixel5Check`
+## License
 
-### Desktop
-Run the desktop application: `./gradlew :composeApp:run`
-Run desktop UI tests: `./gradlew :composeApp:jvmTest`
-
-### iOS
-To run the application on iPhone device/simulator:
- - Open `iosApp/iosApp.xcproject` in Xcode and run standard configuration
- - Or use [Kotlin Multiplatform Mobile plugin](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile) for Android Studio
-Run iOS simulator UI tests: `./gradlew :composeApp:iosSimulatorArm64Test`
+Released under the [Apache License, Version 2.0](https://opensource.org/license/apache-2-0).
 
