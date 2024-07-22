@@ -1,0 +1,47 @@
+name: BUILD APK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  apk-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
+      ANDROID_RELEASE_KEYSTORE_PWD: ${{ secrets.ANDROID_RELEASE_KEYSTORE_PWD }}
+      ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+      ANDROID_RELEASE_KEY_PWD: ${{ secrets.ANDROID_RELEASE_KEY_PWD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Decode Keystore
+        run: |
+          echo $ANDROID_RELEASE_KEYSTORE_BASE64 > keystore_base64.txt
+          base64 -d keystore_base64.txt > fubukidaze-android-release
+
+      - name: Assemble Release
+        run: |
+          ./gradlew :composeApp:assembleRelease
+
+      - name: Get Release APK Path
+        id: releaseApk
+        run: echo "apkfile=$(find composeApp/build/outputs/apk/release/*.apk)" >> $GITHUB_OUTPUT
+
+      - name: Upload APK to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: ${{ steps.releaseApk.outputs.apkfile }}

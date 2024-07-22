@@ -135,7 +135,50 @@ android {
     versionName = fubukidazeVersion
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+    ndk {
+      abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
+    }
   }
+
+  signingConfigs {
+    getByName("debug") {
+      storeFile = rootProject.file("signing/fubukidaze-android-debug")
+      storePassword = "android"
+      keyAlias = "androiddebugkey"
+      keyPassword = "android"
+    }
+
+    create("release") {
+      if (rootProject.file("../fubukidaze-android-release").exists()) {
+        storeFile = rootProject.file("../fubukidaze-android-release")
+        storePassword = properties["ANDROID_RELEASE_KEYSTORE_PWD"]?.toString() ?: ""
+        keyAlias = properties["ANDROID_RELEASE_KEY_ALIAS"]?.toString() ?: ""
+        keyPassword = properties["ANDROID_RELEASE_KEY_PWD"]?.toString() ?: ""
+      } else {
+        storeFile = rootProject.file("signing/fubukidaze-android-debug")
+        storePassword = "android"
+        keyAlias = "androiddebugkey"
+        keyPassword = "android"
+      }
+    }
+  }
+
+  buildTypes {
+    debug {
+      signingConfig = signingConfigs["debug"]
+      versionNameSuffix = "-dev"
+      applicationIdSuffix = ".debug"
+    }
+
+    release {
+      signingConfig = signingConfigs.findByName("release") ?: signingConfigs["debug"]
+      isShrinkResources = true
+      isMinifyEnabled = true
+      proguardFiles("android-proguard-rules.pro")
+    }
+  }
+
   sourceSets["main"].apply {
     manifest.srcFile("src/androidMain/AndroidManifest.xml")
     res.srcDirs("src/androidMain/res")
