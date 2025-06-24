@@ -6,7 +6,6 @@
 |---------------|-----------------|
 | Android       | ✅               |
 | iOS           | ❌ (In Progress) |
-| Desktop (JVM) | ❌ (No Plan)     |
 
 ## License
 
