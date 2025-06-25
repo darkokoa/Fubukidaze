@@ -97,7 +97,7 @@ kotlin {
       implementation(libs.androidx.activityCompose)
       implementation(libs.kotlinx.coroutines.android)
       //noinspection UseTomlInstead
-      implementation("net.java.dev.jna:jna:5.14.0@aar")
+      implementation("net.java.dev.jna:jna:5.17.0@aar")
       implementation(libs.koin.android)
     }
 
