@@ -21,3 +21,4 @@ Pods/
 /secret
 *.gpg
 /composeApp/release
+/.kotlin
