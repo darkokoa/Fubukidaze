@@ -124,11 +124,11 @@ val fubukidazeVersion = LocalDate.now().let { localDate ->
 
 android {
   namespace = "dev.darkokoa.fubukidaze"
-  compileSdk = 34
+  compileSdk = 36
 
   defaultConfig {
     minSdk = 28
-    targetSdk = 34
+    targetSdk = 36
 
     applicationId = "dev.darkokoa.fubukidaze.androidApp"
     versionCode = fubukidazeVersion.replace(".", "").toInt()
