@@ -114,7 +114,7 @@ private fun HomeContent(
                 NodeEditor(NodeEditor.Mode.Edit(it.id))
               )
             },
-            modifier = Modifier.fillMaxWidth().animateItemPlacement()
+            modifier = Modifier.fillMaxWidth().animateItem()
           )
         }
       }
