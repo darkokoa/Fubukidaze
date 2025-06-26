@@ -1,11 +1,11 @@
 package dev.darkokoa.fubukidaze.data.db.dao
 
 import dev.darkokoa.fubukidaze.data.model.entity.FubukidazeNodeEntity
-import io.realm.kotlin.Realm
-import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.query
-import io.realm.kotlin.notifications.ResultsChange
-import io.realm.kotlin.query.RealmSingleQuery
+import io.github.xilinjia.krdb.Realm
+import io.github.xilinjia.krdb.UpdatePolicy
+import io.github.xilinjia.krdb.ext.query
+import io.github.xilinjia.krdb.notifications.ResultsChange
+import io.github.xilinjia.krdb.query.RealmSingleQuery
 import kotlinx.coroutines.flow.Flow
 
 class FubukidazeNodeDao(

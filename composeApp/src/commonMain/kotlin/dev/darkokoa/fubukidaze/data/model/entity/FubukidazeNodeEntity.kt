@@ -2,8 +2,8 @@
 
 package dev.darkokoa.fubukidaze.data.model.entity
 
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
+import io.github.xilinjia.krdb.types.RealmObject
+import io.github.xilinjia.krdb.types.annotations.PrimaryKey
 import org.mongodb.kbson.BsonObjectId
 
 class FubukidazeNodeEntity : RealmObject {

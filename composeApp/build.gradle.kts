@@ -8,10 +8,11 @@ import java.time.LocalDate
 plugins {
   alias(libs.plugins.multiplatform)
   alias(libs.plugins.compose)
+  alias(libs.plugins.compose.compiler)
   alias(libs.plugins.android.application)
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.kotlinx.serialization)
-  alias(libs.plugins.realm)
+  id(libs.versions.krdbId.get())
 }
 
 kotlin {
@@ -82,7 +83,7 @@ kotlin {
       implementation(libs.multiplatformSettings)
       implementation(libs.multiplatformSettings.coroutines)
       implementation(libs.koin.core)
-      implementation(libs.realm.base)
+      implementation(libs.krdb.base)
     }
 
     commonTest.dependencies {
@@ -200,9 +201,6 @@ android {
   }
   buildFeatures {
     compose = true
-  }
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
   }
 }
 

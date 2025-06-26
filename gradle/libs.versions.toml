@@ -1,12 +1,11 @@
 [versions]
 
-kotlin = "2.2.0"
+kotlin = "2.1.20"
 compose = "1.8.2"
-composeCompiler = "1.5.14"
 agp = "8.11.0"
 androidx-activityCompose = "1.10.1"
 androidx-uiTest = "1.8.3"
-voyager = "1.0.1"
+voyager = "1.1.0-beta03"
 kermit = "2.0.6"
 buildConfig = "5.6.7"
 kotlinx-coroutines = "1.10.2"
@@ -16,14 +15,17 @@ kotlinx-datetime = "0.7.0-0.6.x-compat"
 multiplatformMarkdownRendererM3 = "0.35.0"
 multiplatformSettings = "1.3.0"
 koin = "4.1.0"
-realm = "3.0.0"
+krdb = "3.2.7"
+krdbId = "io.github.xilinjia.krdb"
+krdbPlugin = "3.2.7"
 
 [libraries]
 
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-testManifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "androidx-uiTest" }
 androidx-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "androidx-uiTest" }
-realm-base = { module = "io.realm.kotlin:library-base", version.ref = "realm" }
+krdb-base = { module = "io.github.xilinjia.krdb:library-base", version.ref = "krdb" }
+krdb-plugin = { module = "io.github.xilinjia.krdb:gradle-plugin", version.ref = "krdbPlugin" }
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-screenModel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-bottomSheetNavigator = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
@@ -48,7 +50,7 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-realm = { id = "io.realm.kotlin", version.ref = "realm" }
