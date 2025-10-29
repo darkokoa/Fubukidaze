@@ -1,7 +1,7 @@
 package dev.darkokoa.fubukidaze.data.db
 
 import dev.darkokoa.fubukidaze.data.model.entity.FubukidazeNodeEntity
-import io.github.xilinjia.krdb.RealmConfiguration
+import io.realm.kotlin.RealmConfiguration
 
 fun buildRealmConfiguration(): RealmConfiguration {
   return RealmConfiguration

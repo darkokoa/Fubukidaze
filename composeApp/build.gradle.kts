@@ -12,7 +12,7 @@ plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.kotlinx.serialization)
-  id(libs.versions.krdbId.get())
+  alias(libs.plugins.realm)
 }
 
 kotlin {
@@ -83,7 +83,7 @@ kotlin {
       implementation(libs.multiplatformSettings)
       implementation(libs.multiplatformSettings.coroutines)
       implementation(libs.koin.core)
-      implementation(libs.krdb.base)
+      implementation(libs.realm.base)
     }
 
     commonTest.dependencies {

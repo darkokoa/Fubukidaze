@@ -1,6 +1,6 @@
 package dev.darkokoa.fubukidaze.data.db
 
-import io.github.xilinjia.krdb.Realm
+import io.realm.kotlin.Realm
 import org.koin.dsl.module
 
 val dbModule = module {
