@@ -14,7 +14,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import com.mikepenz.markdown.compose.Markdown
@@ -29,7 +29,7 @@ class FubukilLog : Screen {
 
   @Composable
   override fun Content(navigator: Navigator, bottomSheetNavigator: BottomSheetNavigator) {
-    val uiModel = getScreenModel<FubukilLogUiModel>()
+    val uiModel = koinScreenModel<FubukilLogUiModel>()
     val uiState by uiModel.collectAsState()
 
     FubukilLogContent(navigator, uiState)

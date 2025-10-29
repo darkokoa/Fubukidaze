@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import compose.icons.FeatherIcons
@@ -40,7 +40,7 @@ class Home : Screen {
     navigator: Navigator,
     bottomSheetNavigator: BottomSheetNavigator
   ) {
-    val uiModel = getScreenModel<HomeUiModel>()
+    val uiModel = koinScreenModel<HomeUiModel>()
     val uiState by uiModel.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }

@@ -12,8 +12,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import compose.icons.FeatherIcons
@@ -29,7 +28,7 @@ class NodeEditor(
   private val mode: Mode = Mode.Create
 ) : Screen {
 
-  sealed interface Mode: CommonSerializable {
+  sealed interface Mode : CommonSerializable {
     data object Create : Mode
     data class Edit(val id: String) : Mode
   }
@@ -40,7 +39,7 @@ class NodeEditor(
     bottomSheetNavigator: BottomSheetNavigator
   ) {
 
-    val uiModel = getScreenModel<NodeEditorUiModel>(parameters = { parametersOf(mode) })
+    val uiModel = koinScreenModel<NodeEditorUiModel>(parameters = { parametersOf(mode) })
     val uiState by uiModel.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -55,14 +54,14 @@ class NodeEditor(
       }
     }
 
-    LifecycleEffect(
-      onDisposed = {
+    DisposableEffect(Unit) {
+      onDispose {
         runCatching {
           configTextFieldFocusRequester.freeFocus()
         }
         imeController?.hide()
       }
-    )
+    }
 
     LaunchedEffect(Unit) {
       if (mode == Mode.Create) {
